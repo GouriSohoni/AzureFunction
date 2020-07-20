@@ -1,0 +1,2 @@
+# AzureFunction
+Azure function Resources
