@@ -1,0 +1,39 @@
+DOTNET_ADD_GLOBAL_TOOLS_TO_PATH
+DOTNET_SKIP_FIRST_TIME_EXPERIENCE
+
+run.csx
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+
+public static void Run(Stream myBlob, string name, ILogger log)
+{
+    log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
+    //transfer the file to another container
+    var connStr = Environment.GetEnvironmentVariable("connString");
+    log.LogInformation(connStr);
+    // Create a BlobServiceClient object which will be used to create a container client
+    BlobServiceClient blobServiceClient = new BlobServiceClient(connStr);
+
+    //Create a unique name for the container
+    string containerName = "drops2";
+
+    // Create the container and return a container client object
+    BlobContainerClient containerClient =  blobServiceClient.CreateBlobContainerAsync(containerName).Result;
+    //BlobContainerClient containerClient =  blobServiceClient.GetBlobContainerClient(containerName);
+    log.LogInformation("container created");
+    
+}
+
+function.proj
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Azure.Core" Version="1.3.0" />
+	<PackageReference Include="Azure.Storage.Common" Version="12.4.3" />
+<PackageReference Include="Azure.Storage.Blobs" Version="12.4.4" />
+    </ItemGroup>
+</Project>
